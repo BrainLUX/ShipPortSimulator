@@ -16,20 +16,20 @@ public class PortController {
     private int[] minCranesCount;
     private long avgQueryLength = 0;
     private long avgQueryDuration = 0;
-    private int avgDelay = Integer.MAX_VALUE;
+    private int avgDelay = 0;
     private int maxDelay = Integer.MIN_VALUE;
     private long minTime = 0;
+    private ArrayList<Ship> lastDoneList = new ArrayList<>();
     private final Calendar calendar = Calendar.getInstance();
 
     public PortController(LinkedList<Ship> timetable, long startTime) {
         this.timetable = timetable;
         currentTime = new AtomicLong(startTime);
         timetable.forEach(ship -> {
-            if (ship.getDelay().get() < avgDelay) {
-                avgDelay = ship.getDelay().get();
-            } else {
+            if (ship.getDelay().get() > maxDelay) {
                 maxDelay = ship.getDelay().get();
             }
+            avgDelay += ship.getDelay().get();
         });
         calendar.setTimeInMillis(startTime);
     }
@@ -59,12 +59,17 @@ public class PortController {
             System.out.println("Средняя длина очереди на разгрузку: " + avgQueryLength + " кораблей");
             System.out.println("Среднее время ожидания в очереди: " + (avgQueryDuration / 1000 / 60) + " минут");
             System.out.println("Максимальная задержка разгрузки: " + maxDelay + " минут");
-            System.out.println("Средняя задержка разгрузки: " + avgDelay + " минут");
+            System.out.println("Средняя задержка разгрузки: " + (avgDelay / this.timetable.size()) + " минут");
             System.out.println("Общая сумма штрафа : " + minPenalty.get() + " у. е.");
             System.out.println("Итоговое необходимое количество кранов каждого вида:");
             for (Ship.Type value : types) {
                 System.out.println(value.getTitle() + ": " + minCranesCount[value.ordinal()]);
             }
+            System.out.println("Информация о кораблях");
+            for (Ship ship : lastDoneList) {
+                System.out.println(ship);
+            }
+
             return;
         }
         AtomicLong currentTime = new AtomicLong(this.currentTime.get());
@@ -93,10 +98,9 @@ public class PortController {
         AtomicLong processed = new AtomicLong(0);
         final AtomicLong penalty = new AtomicLong(0);
         new Thread(() -> {
+            final ArrayList<Ship> doneList = new ArrayList<>();
             while (true) {
                 currentTime.addAndGet(1000 * 60);
-                final Calendar time = Calendar.getInstance();
-                time.setTimeInMillis(currentTime.get());
                 AtomicReference<Iterator<Ship>> iterator = new AtomicReference<>(timetable.iterator());
                 while (iterator.get().hasNext()) {
                     Ship ship = iterator.get().next();
@@ -115,6 +119,8 @@ public class PortController {
                             if (ship.getDelay().get() == 0) {
                                 penalty.addAndGet(ship.getPenalty(currentTime.get()));
                                 processed.incrementAndGet();
+                                ship.setWorkLengthTime(currentTime.get() - ship.getWorkStartTime());
+                                doneList.add(ship);
                                 iterator.get().remove();
                             } else {
                                 ship.getDelay().decrementAndGet();
@@ -135,14 +141,17 @@ public class PortController {
                             if (ship != null) {
                                 ship.getWorkingCranes().incrementAndGet();
                                 crane.setShip(ship);
+                                ship.setWaitingTime(currentTime.get() - ship.getArriveTime());
+                                ship.setWorkStartTime(currentTime.get());
                                 performShip.get(type).add(ship);
                                 queryDuration.addAndGet(currentTime.get() - ship.getArriveTime());
+                                //TODO удалить и заменить на кол-во кораблей
                                 queryDurationCount.incrementAndGet();
                             }
                         }
                     }
                     synchronized (crane) {
-                        crane.notifyAll();
+                        crane.notify();
                     }
                 }));
                 waitingShip.forEach(((type, ships) ->
@@ -159,16 +168,18 @@ public class PortController {
             }
             long finalPenalty = penalty.get() / 60 * 100;
             System.out.println(minPenalty.get() + " " + finalPenalty + " " + stage);
-            cranesCount[stage] += 1;
+
             if (minPenalty.get() > finalPenalty) {
                 if (minPenalty.get() - finalPenalty < 30000) {
                     if (noChanges >= 10) {
                         cranesCount[stage] -= noChanges;
                         simulate(cranesCount, stage + 1, 0);
                     } else {
+                        cranesCount[stage] += 1;
                         simulate(cranesCount, stage, noChanges + 1);
                     }
                 } else {
+                    cranesCount[stage] += 1;
                     if (queryCount.get() > 0) {
                         avgQueryLength = queryLength.get() / queryCount.get();
                         avgQueryDuration = queryDuration.get() / queryDurationCount.get();
@@ -176,15 +187,17 @@ public class PortController {
                     minTime = currentTime.get();
                     minPenalty.set(finalPenalty);
                     minCranesCount = cranesCount;
+                    lastDoneList.clear();
+                    lastDoneList.addAll(doneList);
                     simulate(cranesCount, stage, 0);
                 }
             } else if (noChanges >= 10) {
                 cranesCount[stage] -= noChanges;
                 simulate(cranesCount, stage + 1, 0);
             } else {
+                cranesCount[stage] += 1;
                 simulate(cranesCount, stage, noChanges + 1);
             }
-
         }).start();
     }
 }
