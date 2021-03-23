@@ -1,26 +1,27 @@
 package com.port.controller;
 
 import com.port.controller.model.CommandController;
+import com.port.controller.model.ConsoleHandler;
 import com.port.controller.model.Operator;
 import com.port.port.PortController;
+import com.port.port.model.StatisticObject;
 import com.port.timetable.TimetableGenerator;
 import com.port.timetable.model.Ship;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Scanner;
-import java.util.UUID;
+import java.util.function.UnaryOperator;
 
-import static com.port.timetable.TimetableGenerator.UUID_LENGTH;
+import static com.port.controller.model.ConsoleHandler.ErrorType.*;
+import static com.port.controller.model.ConsoleHandler.MessageType.*;
 
 public class Program {
     private static final LinkedList<Ship> timetable = new LinkedList<>();
     private final static Scanner scanner = new Scanner(System.in);
     private final static long time = System.currentTimeMillis();
     private static CommandController controller;
+    private static StatisticObject lastStatistic = null;
 
     public static void main(String[] args) {
         //  long time = System.currentTimeMillis();
@@ -63,18 +64,17 @@ public class Program {
     }
 
     private static Void generateNewTimetable() {
-        System.out.println("\nГенерирую расписание");
+        ConsoleHandler.printMessage(TIMETABLE_GENERATE_START);
         timetable.clear();
         timetable.addAll(TimetableGenerator.generate(time));
-        Collections.sort(timetable);
-        System.out.println("Расписание сгенерировано успешно\n");
+        ConsoleHandler.printMessage(TIMETABLE_GENERATE_END);
         return null;
     }
 
     private static Void showTimetable() {
         System.out.println("Вывод расписания:\n");
-        if (timetable.size() == 0) {
-            System.out.println("Вы ещё не сгенерировали ни одного расписания\n");
+        if (timetable.isEmpty()) {
+            ConsoleHandler.printError(NO_TIMETABLE);
         }
         timetable.forEach(System.out::println);
         return null;
@@ -90,21 +90,44 @@ public class Program {
         String weight = scanner.nextLine();
         System.out.println("Введите задержку: ");
         String delay = scanner.nextLine();
-        Ship ship = TimetableGenerator.generateShip(time, date, type, weight, delay);
-        System.out.println("Информация о добавленном корабле: " + ship);
-        timetable.add(ship);
-        Collections.sort(timetable);
+        try {
+            Ship ship = TimetableGenerator.generateShip(time, date, type, weight, delay);
+            System.out.println("Информация о добавленном корабле: " + ship);
+            timetable.add(ship);
+            ConsoleHandler.printMessage(SHIP_ADDED);
+            Collections.sort(timetable);
+        } catch (Exception e) {
+            ConsoleHandler.printError(BAD_INPUT);
+        }
+
         return null;
     }
 
     private static Void startSimulation() {
-        PortController portController = new PortController(timetable, time);
-        portController.initPort();
+        if (timetable.isEmpty()) {
+            ConsoleHandler.printError(NO_TIMETABLE);
+        } else {
+            controller.end();
+            UnaryOperator<StatisticObject> onEnd = statisticObject -> {
+                ConsoleHandler.printMessage(SIMULATION_END);
+                lastStatistic = statisticObject;
+                controller.start();
+                return null;
+            };
+            ConsoleHandler.printMessage(SIMULATION_START);
+            ConsoleHandler.setCyanColor();
+            PortController portController = new PortController(timetable, time, onEnd);
+            portController.initPort();
+        }
         return null;
     }
 
     private static Void showStatistic() {
-
+        if (lastStatistic != null) {
+            System.out.println(lastStatistic);
+        } else {
+            ConsoleHandler.printError(NO_SIMULATIONS);
+        }
         return null;
     }
 

@@ -5,6 +5,7 @@ import com.port.timetable.model.Ship;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Random;
@@ -15,7 +16,7 @@ public class TimetableGenerator {
     private static final int MAX_SHIPS = 200;
     private static final int MAX_WEIGHT = 1000;
     private static final int MAX_WEIGHT_DELAY = 1440;
-    public static final int UUID_LENGTH = 5;
+    private static final int UUID_LENGTH = 5;
     private static final long MAX_TIME_DELAY = 7 * 1000 * 60 * 60 * 24L;
     private static final Random random = new Random();
 
@@ -49,7 +50,7 @@ public class TimetableGenerator {
         return Ship.Type.values()[random.nextInt(Ship.Type.values().length)];
     }
 
-    public static Ship generateShip(Long time, String userDate, String userType, String userWeight, String userDelay) {
+    public static Ship generateShip(Long time, String userDate, String userType, String userWeight, String userDelay) throws NumberFormatException, DateTimeParseException {
         long mills = time + Math.floorMod(random.nextLong(), PERIOD_TIME);
         if (!userDate.isEmpty()) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
