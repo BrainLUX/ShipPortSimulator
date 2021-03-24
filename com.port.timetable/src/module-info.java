@@ -3,4 +3,5 @@ module com.port.timetable {
     requires com.google.gson;
     exports com.port.timetable.model;
     opens com.port.timetable.model;
+    requires org.jetbrains.annotations;
 }

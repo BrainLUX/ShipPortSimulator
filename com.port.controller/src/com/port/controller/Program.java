@@ -54,12 +54,12 @@ public class Program {
     }
 
     private static Operator[] getCommandsHandlers() {
-        Operator<Void> generate = Program::generateNewTimetable;
-        Operator<Void> show = Program::showTimetable;
-        Operator<Void> add = Program::addNewShip;
-        Operator<Void> start = Program::startSimulation;
-        Operator<Void> stats = Program::showStatistic;
-        Operator<Void> quit = Program::quit;
+        final Operator<Void> generate = Program::generateNewTimetable;
+        final Operator<Void> show = Program::showTimetable;
+        final Operator<Void> add = Program::addNewShip;
+        final Operator<Void> start = Program::startSimulation;
+        final Operator<Void> stats = Program::showStatistic;
+        final Operator<Void> quit = Program::quit;
         return new Operator[]{generate, show, add, start, stats, quit};
     }
 
@@ -83,15 +83,15 @@ public class Program {
     private static Void addNewShip() {
         System.out.println("Добавление нового корабля (оставьте поле пустым для случайного значения");
         System.out.println("Введите дату прибытия в формате дд.мм.год чч:мм: ");
-        String date = scanner.nextLine();
+        final String date = scanner.nextLine();
         System.out.println("Выберите тип корабля (1. Сыпучий, 2. Жидкий, 3. Контейнер):");
-        String type = scanner.nextLine();
+        final String type = scanner.nextLine();
         System.out.println("Введите вес: ");
-        String weight = scanner.nextLine();
+        final String weight = scanner.nextLine();
         System.out.println("Введите задержку: ");
-        String delay = scanner.nextLine();
+        final String delay = scanner.nextLine();
         try {
-            Ship ship = TimetableGenerator.generateShip(time, date, type, weight, delay);
+            final Ship ship = TimetableGenerator.generateShip(time, date, type, weight, delay);
             System.out.println("Информация о добавленном корабле: " + ship);
             timetable.add(ship);
             ConsoleHandler.printMessage(SHIP_ADDED);
@@ -108,7 +108,7 @@ public class Program {
             ConsoleHandler.printError(NO_TIMETABLE);
         } else {
             controller.end();
-            UnaryOperator<StatisticObject> onEnd = statisticObject -> {
+            final UnaryOperator<StatisticObject> onEnd = statisticObject -> {
                 ConsoleHandler.printMessage(SIMULATION_END);
                 lastStatistic = statisticObject;
                 controller.start();
@@ -116,7 +116,7 @@ public class Program {
             };
             ConsoleHandler.printMessage(SIMULATION_START);
             ConsoleHandler.setCyanColor();
-            PortController portController = new PortController(timetable, time, onEnd);
+            final PortController portController = new PortController(timetable, time, onEnd);
             portController.initPort();
         }
         return null;

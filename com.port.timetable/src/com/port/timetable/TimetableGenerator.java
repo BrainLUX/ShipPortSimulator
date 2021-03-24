@@ -1,6 +1,7 @@
 package com.port.timetable;
 
 import com.port.timetable.model.Ship;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -12,15 +13,17 @@ import java.util.Random;
 import java.util.UUID;
 
 public class TimetableGenerator {
-    private static final long PERIOD_TIME = 30 * 1000 * 60 * 60 * 24L;
+    public static final int MINUTE = 60 * 1000;
+    public static final int CRANE_COST = 30000;
+    private static final long PERIOD_TIME = 30 * MINUTE * 60 * 24L;
     private static final int MAX_SHIPS = 200;
     private static final int MAX_WEIGHT = 1000;
     private static final int MAX_WEIGHT_DELAY = 1440;
     private static final int UUID_LENGTH = 5;
-    private static final long MAX_TIME_DELAY = 7 * 1000 * 60 * 60 * 24L;
+    private static final long MAX_TIME_DELAY = 7 * MINUTE * 60 * 24L;
     private static final Random random = new Random();
 
-    public static LinkedList<Ship> generate(long time) {
+    public static LinkedList<Ship> generate(final long time) {
         final LinkedList<Ship> timetable = new LinkedList<>();
         final int shipCount = random.nextInt(MAX_SHIPS);
         for (int i = 0; i < shipCount; i++) {
@@ -31,7 +34,7 @@ public class TimetableGenerator {
         return randomValues(timetable, time);
     }
 
-    private static LinkedList<Ship> randomValues(LinkedList<Ship> timetable, long time) {
+    private static LinkedList<Ship> randomValues(@NotNull final LinkedList<Ship> timetable, final long time) {
         timetable.forEach(ship -> {
             int d = random.nextInt(MAX_WEIGHT_DELAY);
             ship.setDelay(d);
@@ -50,7 +53,11 @@ public class TimetableGenerator {
         return Ship.Type.values()[random.nextInt(Ship.Type.values().length)];
     }
 
-    public static Ship generateShip(Long time, String userDate, String userType, String userWeight, String userDelay) throws NumberFormatException, DateTimeParseException {
+    public static Ship generateShip(@NotNull final Long time,
+                                    @NotNull final String userDate,
+                                    @NotNull final String userType,
+                                    @NotNull final String userWeight,
+                                    @NotNull final String userDelay) throws NumberFormatException, DateTimeParseException {
         long mills = time + Math.floorMod(random.nextLong(), PERIOD_TIME);
         if (!userDate.isEmpty()) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");

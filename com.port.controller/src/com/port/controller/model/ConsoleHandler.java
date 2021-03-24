@@ -1,15 +1,17 @@
 package com.port.controller.model;
 
+import org.jetbrains.annotations.NotNull;
+
 public class ConsoleHandler {
-    public static void printError(ErrorType type) {
+    public static void printError(@NotNull final ErrorType type) {
         print(CommandController.ANSI_RED, type.getMessage());
     }
 
-    public static void printMessage(MessageType message) {
+    public static void printMessage(@NotNull final MessageType message) {
         print(CommandController.ANSI_GREEN, message.getMessage());
     }
 
-    private static void print(String color, String message) {
+    private static void print(@NotNull final String color, @NotNull final String message) {
         setColor(color);
         System.out.println(message);
         System.out.println();
@@ -24,7 +26,7 @@ public class ConsoleHandler {
         setColor(CommandController.ANSI_RESET);
     }
 
-    private static void setColor(String color) {
+    private static void setColor(@NotNull final String color) {
         System.out.print(color);
     }
 
@@ -35,7 +37,7 @@ public class ConsoleHandler {
 
         private final String message;
 
-        ErrorType(String title) {
+        ErrorType(@NotNull final String title) {
             this.message = title;
         }
 
@@ -54,7 +56,7 @@ public class ConsoleHandler {
 
         private final String message;
 
-        MessageType(String title) {
+        MessageType(@NotNull final String title) {
             this.message = title;
         }
 

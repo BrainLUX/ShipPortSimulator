@@ -1,5 +1,6 @@
 package com.port.port.model;
 
+import org.jetbrains.annotations.Nullable;
 import com.port.timetable.model.Ship;
 
 public class Crane extends Thread {
@@ -35,7 +36,7 @@ public class Crane extends Thread {
         }
     }
 
-    public void setShip(Ship ship) {
+    public void setShip(@Nullable final Ship ship) {
         this.ship = ship;
     }
 

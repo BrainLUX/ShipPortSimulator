@@ -1,17 +1,15 @@
 package com.port.controller.model;
 
+import org.jetbrains.annotations.NotNull;
+
 import static com.port.controller.model.ConsoleHandler.MessageType.CHOOSE_ACTION;
 
 public class CommandController {
     static final String ANSI_RESET = "\u001B[0m";
-    static final String ANSI_BLACK = "\u001B[30m";
     static final String ANSI_RED = "\u001B[31m";
     static final String ANSI_GREEN = "\u001B[32m";
-    static final String ANSI_YELLOW = "\u001B[33m";
-    static final String ANSI_BLUE = "\u001B[34m";
-    static final String ANSI_PURPLE = "\u001B[35m";
+    private static final String ANSI_BLUE = "\u001B[34m";
     static final String ANSI_CYAN = "\u001B[36m";
-    static final String ANSI_WHITE = "\u001B[37m";
 
     private final Command[] COMMANDS = Command.values();
 
@@ -20,7 +18,7 @@ public class CommandController {
 
     private boolean isRunning = false;
 
-    public CommandController(Operator<String> handleUserInput, Operator[] userCommands) {
+    public CommandController(@NotNull final Operator<String> handleUserInput, @NotNull final Operator[] userCommands) {
         this.handleUserInput = handleUserInput;
         this.userCommands = userCommands;
     }
@@ -38,14 +36,14 @@ public class CommandController {
     }
 
     private void checkUserInput() {
-        String input = handleUserInput.execute();
-        int code = Integer.parseInt(input) - 1;
+        final String input = handleUserInput.execute();
+        final int code = Integer.parseInt(input) - 1;
         userCommands[code].execute();
     }
 
     private void printCommands() {
         ConsoleHandler.printMessage(CHOOSE_ACTION);
-        for (Command command : COMMANDS) {
+        for (final Command command : COMMANDS) {
             System.out.println((command.ordinal() + 1) + ". " + command.getTitle());
         }
     }
@@ -60,7 +58,7 @@ public class CommandController {
 
         private final String title;
 
-        Command(String title) {
+        Command(@NotNull final String title) {
             this.title = title;
         }
 

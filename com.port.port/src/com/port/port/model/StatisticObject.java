@@ -1,6 +1,7 @@
 package com.port.port.model;
 
 import com.port.timetable.model.Ship;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -17,7 +18,11 @@ public class StatisticObject {
     private final int[] minCranesCount;
     private final ArrayList<Ship> shipList;
 
-    public StatisticObject(long startTime, long endTime, long avgQueryLength, long avgQueryDuration, long avgDelay, long maxDelay, long penalty, int[] minCranesCount, ArrayList<Ship> shipList) {
+    public StatisticObject(final long startTime, final long endTime,
+                           final long avgQueryLength, final long avgQueryDuration,
+                           final long avgDelay, final long maxDelay,
+                           final long penalty, @NotNull final int[] minCranesCount,
+                           @NotNull final ArrayList<Ship> shipList) {
         this.startTime = startTime;
         this.endTime = endTime;
         this.avgQueryLength = avgQueryLength;
@@ -31,9 +36,9 @@ public class StatisticObject {
 
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder();
+        final StringBuilder result = new StringBuilder();
         System.out.println();
-        Calendar calendar = Calendar.getInstance();
+        final Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(startTime);
         result.append("Время начала разгрузки ").append(String.format("%d-го %s в %d:%d",
                 calendar.get(Calendar.DAY_OF_MONTH),
@@ -53,11 +58,11 @@ public class StatisticObject {
         result.append("Средняя задержка разгрузки: ").append(avgDelay / shipList.size()).append(" минут").append("\n");
         result.append("Общая сумма штрафа : ").append(penalty).append(" у. е.").append("\n");
         result.append("Итоговое необходимое количество кранов каждого вида:").append("\n");
-        for (Ship.Type value : Ship.Type.values()) {
+        for (final Ship.Type value : Ship.Type.values()) {
             result.append(value.getTitle()).append(": ").append(minCranesCount[value.ordinal()]).append("\n");
         }
         result.append("Информация о кораблях").append("\n");
-        for (Ship ship : shipList) {
+        for (final Ship ship : shipList) {
             result.append(ship).append("\n");
         }
         return result.toString();
