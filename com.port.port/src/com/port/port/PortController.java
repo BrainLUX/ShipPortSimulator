@@ -139,10 +139,10 @@ public class PortController {
                         }
                     }
                 }
-                crane.work();
-//                synchronized (crane) {
-//                    crane.notify();
-//                }
+                //crane.work();
+                synchronized (crane.mutex) {
+                    crane.mutex.notify();
+                }
             }));
 //            cranes.forEach((type, craneList) -> craneList.forEach(crane -> {
 //                try {
@@ -151,6 +151,7 @@ public class PortController {
 //                    e.printStackTrace();
 //                }
 //            }));
+            // System.out.println("main");
             waitingShip.forEach(((type, ships) ->
             {
                 if (ships.size() > 0) {
