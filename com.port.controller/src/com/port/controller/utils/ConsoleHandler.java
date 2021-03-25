@@ -1,4 +1,4 @@
-package com.port.controller.model;
+package com.port.controller.utils;
 
 import org.jetbrains.annotations.NotNull;
 

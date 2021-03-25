@@ -1,8 +1,8 @@
 package com.port.controller;
 
 import com.google.gson.Gson;
-import com.port.controller.model.CommandController;
-import com.port.controller.model.ConsoleHandler;
+import com.port.controller.utils.CommandController;
+import com.port.controller.utils.ConsoleHandler;
 import com.port.controller.model.Operator;
 import com.port.port.PortController;
 import com.port.port.model.StatisticObject;
@@ -17,8 +17,8 @@ import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.function.UnaryOperator;
 
-import static com.port.controller.model.ConsoleHandler.ErrorType.*;
-import static com.port.controller.model.ConsoleHandler.MessageType.*;
+import static com.port.controller.utils.ConsoleHandler.ErrorType.*;
+import static com.port.controller.utils.ConsoleHandler.MessageType.*;
 
 public class Program {
 

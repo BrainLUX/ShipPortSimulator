@@ -1,8 +1,9 @@
-package com.port.controller.model;
+package com.port.controller.utils;
 
+import com.port.controller.model.Operator;
 import org.jetbrains.annotations.NotNull;
 
-import static com.port.controller.model.ConsoleHandler.MessageType.CHOOSE_ACTION;
+import static com.port.controller.utils.ConsoleHandler.MessageType.CHOOSE_ACTION;
 
 public class CommandController {
     static final String ANSI_RESET = "\u001B[0m";
