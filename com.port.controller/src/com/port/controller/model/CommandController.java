@@ -36,9 +36,13 @@ public class CommandController {
     }
 
     private void checkUserInput() {
-        final String input = handleUserInput.execute();
-        final int code = Integer.parseInt(input) - 1;
-        userCommands[code].execute();
+        try {
+            final String input = handleUserInput.execute();
+            final int code = Integer.parseInt(input) - 1;
+            userCommands[code].execute();
+        } catch (NumberFormatException e) {
+            ConsoleHandler.printError(ConsoleHandler.ErrorType.BAD_INPUT);
+        }
     }
 
     private void printCommands() {

@@ -2,13 +2,22 @@ package com.port.controller.model;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Scanner;
+
 public class ConsoleHandler {
+    private static final String USER_YES = "+";
+
     public static void printError(@NotNull final ErrorType type) {
         print(CommandController.ANSI_RED, type.getMessage());
     }
 
     public static void printMessage(@NotNull final MessageType message) {
         print(CommandController.ANSI_GREEN, message.getMessage());
+    }
+
+    public static boolean askUser(@NotNull final MessageType message, @NotNull final Scanner scanner) {
+        print(CommandController.ANSI_GREEN, message.getMessage() + " (" + USER_YES + ")");
+        return scanner.nextLine().trim().toLowerCase().equals(USER_YES);
     }
 
     private static void print(@NotNull final String color, @NotNull final String message) {
@@ -53,7 +62,9 @@ public class ConsoleHandler {
         CHOOSE_ACTION("Выберите действие:"),
         SHIP_ADDED("Корабль успешно добавлен"),
         TIMETABLE_GENERATE_START("Генерирую расписание"),
-        TIMETABLE_GENERATE_END("Расписание сгенерировано успешно");
+        TIMETABLE_GENERATE_END("Расписание сгенерировано успешно"),
+        PRINT_SHIPS("Вывести статистику по кораблям?"),
+        QUIT("Подтверждаете выход из программы?");
 
         private final String message;
 

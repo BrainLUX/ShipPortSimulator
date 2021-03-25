@@ -34,6 +34,15 @@ public class StatisticObject {
         this.shipList = shipList;
     }
 
+    public void printShipStat() {
+        final StringBuilder result = new StringBuilder();
+        result.append("Информация о кораблях").append("\n");
+        for (final Ship ship : shipList) {
+            result.append(ship).append("\n");
+        }
+        System.out.println(result.toString());
+    }
+
     @Override
     public String toString() {
         final StringBuilder result = new StringBuilder();
@@ -60,10 +69,6 @@ public class StatisticObject {
         result.append("Итоговое необходимое количество кранов каждого вида:").append("\n");
         for (final Ship.Type value : Ship.Type.values()) {
             result.append(value.getTitle()).append(": ").append(minCranesCount[value.ordinal()]).append("\n");
-        }
-        result.append("Информация о кораблях").append("\n");
-        for (final Ship ship : shipList) {
-            result.append(ship).append("\n");
         }
         return result.toString();
     }

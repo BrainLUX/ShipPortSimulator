@@ -10,7 +10,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
@@ -34,7 +33,9 @@ public class PortController {
     private ArrayList<Ship> lastDoneList = new ArrayList<>();
     private final Calendar calendar = Calendar.getInstance();
     private final UnaryOperator<StatisticObject> onEnd;
+    private StatisticObject statisticObject;
 
+    @SuppressWarnings("deprecation")
     public PortController(final long startTime, @NotNull final UnaryOperator<StatisticObject> onEnd) throws FileNotFoundException {
         JsonParser jsonParser = new JsonParser();
         JsonElement obj = jsonParser.parse(new Scanner(new File(TIMETABLE_FILE)).nextLine());
@@ -53,17 +54,17 @@ public class PortController {
     }
 
     public void initPort() {
-        final int[] cranesCount = new int[]{2, 2, 2};
+        final int[] cranesCount = new int[]{1, 1, 1};
         simulate(cranesCount, 0, 0);
+        onEnd.apply(statisticObject);
     }
 
     private void simulate(@NotNull final int[] cranesCount, final int stage, final int noChanges) {
         final Ship.Type[] types = Ship.Type.values();
         if (stage == 3) {
-            final StatisticObject statisticObject = new StatisticObject(calendar.getTimeInMillis(), minTime, avgQueryLength,
+            statisticObject = new StatisticObject(calendar.getTimeInMillis(), minTime, avgQueryLength,
                     avgQueryDuration, avgDelay, maxDelay, minPenalty.get(), minCranesCount, lastDoneList);
             System.out.println();
-            onEnd.apply(statisticObject);
             return;
         }
         final AtomicLong currentTime = new AtomicLong(this.currentTime.get());
@@ -117,7 +118,6 @@ public class PortController {
                     }
                 }
             });
-            // System.out.println("main");
             cranes.forEach((type, craneList) -> craneList.forEach(crane -> {
                 if (crane.isEnded()) {
                     performShip.get(type).forEach(ship -> {

@@ -1,8 +1,6 @@
 package com.port.controller;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.port.controller.model.CommandController;
 import com.port.controller.model.ConsoleHandler;
 import com.port.controller.model.Operator;
@@ -29,21 +27,8 @@ public class Program {
     private final static long time = System.currentTimeMillis();
     private static CommandController controller;
     private static StatisticObject lastStatistic = null;
-    private static FileWriter fileWriter;
 
     public static void main(String[] args) {
-        //  long time = System.currentTimeMillis();
-        //  final LinkedList<Ship> timetable = TimetableGenerator.generate(time);
-//        final LinkedList<Ship> timetable = new LinkedList<>();
-//        String json = "";
-//        JsonParser jsonParser = new JsonParser();
-//        JsonElement obj = jsonParser.parse(json);
-//        for (JsonElement elem : obj.getAsJsonArray()) {
-//            timetable.add(new Gson().fromJson(elem.toString(), Ship.class));
-//        }
-//        Collections.sort(timetable);
-//        timetable.forEach(System.out::println);
-
         Operator<String> handleUserInput = scanner::nextLine;
         controller = new CommandController(handleUserInput, getCommandsHandlers());
         controller.start();
@@ -65,7 +50,7 @@ public class Program {
         timetable.addAll(TimetableGenerator.generate(time));
         String json = new Gson().toJson(timetable);
         try {
-            fileWriter = new FileWriter(PortController.TIMETABLE_FILE);
+            FileWriter fileWriter = new FileWriter(PortController.TIMETABLE_FILE);
             fileWriter.write(json);
             fileWriter.flush();
             fileWriter.close();
@@ -135,6 +120,9 @@ public class Program {
     private static Void showStatistic() {
         if (lastStatistic != null) {
             System.out.println(lastStatistic);
+            if (ConsoleHandler.askUser(PRINT_SHIPS, scanner)) {
+                lastStatistic.printShipStat();
+            }
         } else {
             ConsoleHandler.printError(NO_SIMULATIONS);
         }
@@ -142,8 +130,7 @@ public class Program {
     }
 
     private static Void quit() {
-        System.out.println("Подтверждаете выход из программы (+/-)?");
-        if (scanner.nextLine().trim().toLowerCase().equals("+")) {
+        if (ConsoleHandler.askUser(QUIT, scanner)) {
             controller.end();
         }
         return null;
