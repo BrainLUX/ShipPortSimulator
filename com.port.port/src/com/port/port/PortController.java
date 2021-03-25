@@ -1,12 +1,17 @@
 package com.port.port;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.port.port.model.Crane;
 import com.port.port.model.StatisticObject;
 import com.port.timetable.model.Ship;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.*;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.UnaryOperator;
@@ -16,7 +21,8 @@ import static com.port.timetable.TimetableGenerator.MINUTE;
 
 public class PortController {
 
-    private final LinkedList<Ship> timetable;
+    public static final String TIMETABLE_FILE = "timetable.json";
+    private final LinkedList<Ship> timetable = new LinkedList<>();
     private final AtomicLong currentTime;
     private AtomicLong minPenalty = new AtomicLong(Long.MAX_VALUE);
     private int[] minCranesCount;
@@ -29,8 +35,12 @@ public class PortController {
     private final Calendar calendar = Calendar.getInstance();
     private final UnaryOperator<StatisticObject> onEnd;
 
-    public PortController(@NotNull final LinkedList<Ship> timetable, final long startTime, @NotNull final UnaryOperator<StatisticObject> onEnd) {
-        this.timetable = timetable;
+    public PortController(final long startTime, @NotNull final UnaryOperator<StatisticObject> onEnd) throws FileNotFoundException {
+        JsonParser jsonParser = new JsonParser();
+        JsonElement obj = jsonParser.parse(new Scanner(new File(TIMETABLE_FILE)).nextLine());
+        for (JsonElement elem : obj.getAsJsonArray()) {
+            this.timetable.add(new Gson().fromJson(elem.toString(), Ship.class));
+        }
         currentTime = new AtomicLong(startTime);
         timetable.forEach(ship -> {
             if (ship.getDelay().get() > maxDelay) {

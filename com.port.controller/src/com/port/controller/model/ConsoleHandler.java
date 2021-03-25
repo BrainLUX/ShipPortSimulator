@@ -33,7 +33,8 @@ public class ConsoleHandler {
     public enum ErrorType {
         NO_TIMETABLE("Вы ещё не сгенерировали ни одного расписания"),
         NO_SIMULATIONS("Сначала нужно провести симуляцию"),
-        BAD_INPUT("Проверьте корректность введённых данных");
+        BAD_INPUT("Проверьте корректность введённых данных"),
+        FILE_ERROR("Ошибка записи в файл");
 
         private final String message;
 
