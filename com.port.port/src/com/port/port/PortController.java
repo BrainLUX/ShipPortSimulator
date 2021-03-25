@@ -6,6 +6,7 @@ import com.port.timetable.model.Ship;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.UnaryOperator;
@@ -96,18 +97,17 @@ public class PortController {
                 while (iterator.get().hasNext()) {
                     final Ship ship = iterator.get().next();
                     if (ship.getGoods().get() == 0) {
-                        if (ship.getDelay().get() == 0) {
+                        if (ship.getDelay().updateAndGet(n -> (n > 0) ? n - 1 : n) == 0) {
                             penalty.addAndGet(ship.getPenalty(currentTime.get()));
                             processed.incrementAndGet();
                             ship.setWorkLengthTime(currentTime.get() - ship.getWorkStartTime());
                             doneList.add(ship);
                             iterator.get().remove();
-                        } else {
-                            ship.getDelay().decrementAndGet();
                         }
                     }
                 }
             });
+            // System.out.println("main");
             cranes.forEach((type, craneList) -> craneList.forEach(crane -> {
                 if (crane.isEnded()) {
                     performShip.get(type).forEach(ship -> {
@@ -129,10 +129,18 @@ public class PortController {
                         }
                     }
                 }
-                synchronized (crane) {
-                    crane.notify();
-                }
+                crane.work();
+//                synchronized (crane) {
+//                    crane.notify();
+//                }
             }));
+//            cranes.forEach((type, craneList) -> craneList.forEach(crane -> {
+//                try {
+//                    crane.executor.join();
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }));
             waitingShip.forEach(((type, ships) ->
             {
                 if (ships.size() > 0) {
@@ -148,6 +156,9 @@ public class PortController {
         }
         final long finalPenalty = penalty.get() / 60 * 100;
         System.out.print("█");
+
+//        onEnd.apply(null);
+//        return;
         if (minPenalty.get() > finalPenalty) {
             if (minPenalty.get() - finalPenalty < CRANE_COST) {
                 if (noChanges >= 3) {

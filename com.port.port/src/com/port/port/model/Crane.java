@@ -3,37 +3,46 @@ package com.port.port.model;
 import org.jetbrains.annotations.Nullable;
 import com.port.timetable.model.Ship;
 
-public class Crane extends Thread {
-    private Ship ship;
-    private volatile boolean running = true;
+public class Crane {
+    private volatile Ship ship;
+    private volatile boolean running = false;
+    private volatile boolean work = false;
+    public Thread executor;
 
     public Crane() {
         ship = null;
-        this.start();
+        running = true;
     }
 
     public boolean isEnded() {
         return ship == null;
     }
 
-    @Override
-    public void run() {
-        super.run();
-        while (running) {
-            if (ship != null) {
-                if (ship.getGoods().updateAndGet(n -> (n > 0) ? n - 1 : n) == 0 && ship.getDelay().get() == 0) {
-                    setShip(null);
-                }
-            }
-            synchronized (this) {
-                if (!this.isInterrupted()) {
-                    try {
-                        wait();
-                    } catch (InterruptedException ignored) {
-                    }
-                }
+    public void work(){
+        if (ship != null) {
+            if (ship.getGoods().updateAndGet(n -> (n > 0) ? n - 1 : n) == 0 && ship.getDelay().get() == 0) {
+                setShip(null);
             }
         }
+    }
+
+    public void work2() {
+        if (ship != null) {
+            executor = new Thread(() -> {
+                //System.out.println("crane");
+                if (ship != null) {
+                    if (ship.getGoods().updateAndGet(n -> (n > 0) ? n - 1 : n) == 0 && ship.getDelay().get() == 0) {
+                        setShip(null);
+                    }
+                }
+            });
+            executor.start();
+        }
+//        if (ship != null) {
+//            if (ship.getGoods().updateAndGet(n -> (n > 0) ? n - 1 : n) == 0 && ship.getDelay().get() == 0) {
+//                setShip(null);
+//            }
+//        }
     }
 
     public void setShip(@Nullable final Ship ship) {
@@ -42,6 +51,6 @@ public class Crane extends Thread {
 
     public void terminate() {
         running = false;
-        interrupt();
+        // executor.interrupt();
     }
 }

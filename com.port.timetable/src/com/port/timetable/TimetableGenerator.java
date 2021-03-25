@@ -16,7 +16,7 @@ public class TimetableGenerator {
     public static final int MINUTE = 60 * 1000;
     public static final int CRANE_COST = 30000;
     private static final long PERIOD_TIME = 30 * MINUTE * 60 * 24L;
-    private static final int MAX_SHIPS = 200;
+    private static final int MAX_SHIPS = 1000;
     private static final int MAX_WEIGHT = 1000;
     private static final int MAX_WEIGHT_DELAY = 1440;
     private static final int UUID_LENGTH = 5;

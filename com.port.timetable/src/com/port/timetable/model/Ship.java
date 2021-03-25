@@ -1,9 +1,13 @@
 package com.port.timetable.model;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+
+import static com.port.timetable.TimetableGenerator.MINUTE;
 
 public class Ship implements Cloneable, Comparable<Ship> {
     private long arriveTime;
@@ -23,7 +27,7 @@ public class Ship implements Cloneable, Comparable<Ship> {
         this(0, "", Type.LIQUID, 0);
     }
 
-    public Ship(long arriveTime, String name, Type type, int weight) {
+    public Ship(final long arriveTime, @NotNull final String name, @NotNull final Type type, final int weight) {
         this.arriveTime = arriveTime;
         this.name = name;
         this.type = type;
@@ -45,7 +49,7 @@ public class Ship implements Cloneable, Comparable<Ship> {
         stayTime = (goods.get() / 2) * 1000 * 60;
     }
 
-    public void setDelay(int delay) {
+    public void setDelay(final int delay) {
         this.delay.addAndGet(delay);
     }
 
@@ -53,8 +57,8 @@ public class Ship implements Cloneable, Comparable<Ship> {
         return delay;
     }
 
-    public long getPenalty(long currentTime) {
-        return Math.max(0, currentTime - arriveTime - stayTime) / 1000 / 60;
+    public long getPenalty(final long currentTime) {
+        return Math.max(0, currentTime - arriveTime - stayTime) / MINUTE;
     }
 
     public AtomicInteger getWorkingCranes() {
@@ -77,12 +81,12 @@ public class Ship implements Cloneable, Comparable<Ship> {
         return workStartTime;
     }
 
-    public void setWorkStartTime(long workStartTime) {
+    public void setWorkStartTime(final long workStartTime) {
         this.workStartTime = workStartTime;
     }
 
 
-    public void setWorkLengthTime(long workLengthTime) {
+    public void setWorkLengthTime(final long workLengthTime) {
         this.workLengthTime = workLengthTime;
     }
 
@@ -95,7 +99,7 @@ public class Ship implements Cloneable, Comparable<Ship> {
         LOOSE("сыпучий"), LIQUID("жидкий"), CONTAINER("контейнер");
         private final String title;
 
-        Type(String title) {
+        Type(@NotNull final String title) {
             this.title = title;
         }
 
@@ -108,7 +112,7 @@ public class Ship implements Cloneable, Comparable<Ship> {
         TONS("тонн"), PIECES("контейнеров");
         private final String title;
 
-        WeightType(String title) {
+        WeightType(@NotNull final String title) {
             this.title = title;
         }
 
@@ -121,11 +125,11 @@ public class Ship implements Cloneable, Comparable<Ship> {
         return arriveTime;
     }
 
-    public void updateArriveTime(long delay) {
+    public void updateArriveTime(final long delay) {
         arriveTime += delay;
     }
 
-    private String getTime(long time) {
+    private String getTime(final long time) {
         final Calendar format = Calendar.getInstance();
         format.setTimeInMillis(time);
         return String.format("%d-го %s в %d:%d",
