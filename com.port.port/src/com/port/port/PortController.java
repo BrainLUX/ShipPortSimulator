@@ -139,18 +139,8 @@ public class PortController {
                         }
                     }
                 }
-                crane.work();
-//                synchronized (crane) {
-//                    crane.notify();
-//                }
+                crane.startWorking();
             }));
-//            cranes.forEach((type, craneList) -> craneList.forEach(crane -> {
-//                try {
-//                    crane.executor.join();
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }));
             waitingShip.forEach(((type, ships) ->
             {
                 if (ships.size() > 0) {
@@ -167,8 +157,6 @@ public class PortController {
         final long finalPenalty = penalty.get() / 60 * 100;
         System.out.print("█");
 
-//        onEnd.apply(null);
-//        return;
         if (minPenalty.get() > finalPenalty) {
             if (minPenalty.get() - finalPenalty < CRANE_COST) {
                 if (noChanges >= 3) {

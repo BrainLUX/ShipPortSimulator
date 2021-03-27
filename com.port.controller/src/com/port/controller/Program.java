@@ -48,15 +48,6 @@ public class Program {
         ConsoleHandler.printMessage(TIMETABLE_GENERATE_START);
         timetable.clear();
         timetable.addAll(TimetableGenerator.generate(time));
-        String json = new Gson().toJson(timetable);
-        try {
-            FileWriter fileWriter = new FileWriter(PortController.TIMETABLE_FILE);
-            fileWriter.write(json);
-            fileWriter.flush();
-            fileWriter.close();
-        } catch (IOException e) {
-            ConsoleHandler.printError(FILE_ERROR);
-        }
         ConsoleHandler.printMessage(TIMETABLE_GENERATE_END);
         return null;
     }
@@ -104,13 +95,18 @@ public class Program {
                 controller.start();
                 return null;
             };
-            ConsoleHandler.printMessage(SIMULATION_START);
-            ConsoleHandler.setCyanColor();
-            final PortController portController;
+            String json = new Gson().toJson(timetable);
             try {
+                FileWriter fileWriter = new FileWriter(PortController.TIMETABLE_FILE);
+                fileWriter.write(json);
+                fileWriter.flush();
+                fileWriter.close();
+                ConsoleHandler.printMessage(SIMULATION_START);
+                ConsoleHandler.setCyanColor();
+                final PortController portController;
                 portController = new PortController(time, onEnd);
                 portController.initPort();
-            } catch (FileNotFoundException e) {
+            } catch (IOException e) {
                 ConsoleHandler.printError(FILE_ERROR);
             }
         }
