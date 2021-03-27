@@ -30,7 +30,7 @@ public class Program {
     private static StatisticObject lastStatistic = null;
 
     public static void main(String[] args) {
-        Operator<String> handleUserInput = scanner::nextLine;
+        final Operator<String> handleUserInput = scanner::nextLine;
         controller = new CommandController(handleUserInput, getCommandsHandlers());
         controller.start();
     }
@@ -101,16 +101,15 @@ public class Program {
                 controller.start();
                 return null;
             };
-            String json = new Gson().toJson(timetable);
+            final String json = new Gson().toJson(timetable);
             try {
-                FileWriter fileWriter = new FileWriter(PortController.TIMETABLE_FILE);
+                final FileWriter fileWriter = new FileWriter(PortController.TIMETABLE_FILE);
                 fileWriter.write(json);
                 fileWriter.flush();
                 fileWriter.close();
                 ConsoleHandler.printMessage(SIMULATION_START);
                 ConsoleHandler.setCyanColor();
-                final PortController portController;
-                portController = new PortController(time, onEnd);
+                final PortController portController = new PortController(time, onEnd);
                 portController.initPort();
             } catch (IOException e) {
                 ConsoleHandler.printError(FILE_ERROR);
