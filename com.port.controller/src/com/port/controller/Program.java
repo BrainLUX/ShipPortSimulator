@@ -1,15 +1,16 @@
 package com.port.controller;
 
 import com.google.gson.Gson;
+import com.port.controller.model.Operator;
 import com.port.controller.utils.CommandController;
 import com.port.controller.utils.ConsoleHandler;
-import com.port.controller.model.Operator;
 import com.port.port.PortController;
 import com.port.port.model.StatisticObject;
 import com.port.timetable.TimetableGenerator;
 import com.port.timetable.model.Ship;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collections;
@@ -34,6 +35,7 @@ public class Program {
         controller.start();
     }
 
+    @NotNull
     private static Operator[] getCommandsHandlers() {
         final Operator<Void> generate = Program::generateNewTimetable;
         final Operator<Void> show = Program::showTimetable;
@@ -44,6 +46,7 @@ public class Program {
         return new Operator[]{generate, show, add, start, stats, quit};
     }
 
+    @Nullable
     private static Void generateNewTimetable() {
         ConsoleHandler.printMessage(TIMETABLE_GENERATE_START);
         timetable.clear();
@@ -52,6 +55,7 @@ public class Program {
         return null;
     }
 
+    @Nullable
     private static Void showTimetable() {
         System.out.println("Вывод расписания:\n");
         if (timetable.isEmpty()) {
@@ -61,6 +65,7 @@ public class Program {
         return null;
     }
 
+    @Nullable
     private static Void addNewShip() {
         System.out.println("Добавление нового корабля (оставьте поле пустым для случайного значения");
         System.out.println("Введите дату прибытия в формате дд.мм.год чч:мм: ");
@@ -84,6 +89,7 @@ public class Program {
         return null;
     }
 
+    @Nullable
     private static Void startSimulation() {
         if (timetable.isEmpty()) {
             ConsoleHandler.printError(NO_TIMETABLE);
@@ -113,6 +119,7 @@ public class Program {
         return null;
     }
 
+    @Nullable
     private static Void showStatistic() {
         if (lastStatistic != null) {
             System.out.println(lastStatistic);
@@ -125,6 +132,7 @@ public class Program {
         return null;
     }
 
+    @Nullable
     private static Void quit() {
         if (ConsoleHandler.askUser(QUIT, scanner)) {
             controller.end();

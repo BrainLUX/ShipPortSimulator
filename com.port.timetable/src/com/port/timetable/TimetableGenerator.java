@@ -23,6 +23,7 @@ public class TimetableGenerator {
     private static final long MAX_TIME_DELAY = 7 * MINUTE * 60 * 24L;
     private static final Random random = new Random();
 
+    @NotNull
     public static LinkedList<Ship> generate(final long time) {
         final LinkedList<Ship> timetable = new LinkedList<>();
         final int shipCount = random.nextInt(MAX_SHIPS);
@@ -34,6 +35,7 @@ public class TimetableGenerator {
         return randomValues(timetable, time);
     }
 
+    @NotNull
     private static LinkedList<Ship> randomValues(@NotNull final LinkedList<Ship> timetable, final long time) {
         timetable.forEach(ship -> {
             int d = random.nextInt(MAX_WEIGHT_DELAY);
@@ -49,10 +51,12 @@ public class TimetableGenerator {
         return timetable;
     }
 
+    @NotNull
     private static Ship.Type getRandomShipType() {
         return Ship.Type.values()[random.nextInt(Ship.Type.values().length)];
     }
 
+    @NotNull
     public static Ship generateShip(@NotNull final Long time,
                                     @NotNull final String userDate,
                                     @NotNull final String userType,

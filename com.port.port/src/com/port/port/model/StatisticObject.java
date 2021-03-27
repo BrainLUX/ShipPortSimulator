@@ -43,6 +43,7 @@ public class StatisticObject {
         System.out.println(result.toString());
     }
 
+    @NotNull
     @Override
     public String toString() {
         final StringBuilder result = new StringBuilder();

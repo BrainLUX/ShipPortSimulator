@@ -53,6 +53,7 @@ public class Ship implements Cloneable, Comparable<Ship> {
         this.delay.addAndGet(delay);
     }
 
+    @NotNull
     public AtomicInteger getDelay() {
         return delay;
     }
@@ -61,14 +62,17 @@ public class Ship implements Cloneable, Comparable<Ship> {
         return Math.max(0, currentTime - arriveTime - stayTime) / MINUTE;
     }
 
+    @NotNull
     public AtomicInteger getWorkingCranes() {
         return workingCranes;
     }
 
+    @NotNull
     public AtomicLong getGoods() {
         return goods;
     }
 
+    @NotNull
     public Type getType() {
         return type;
     }
@@ -85,7 +89,6 @@ public class Ship implements Cloneable, Comparable<Ship> {
         this.workStartTime = workStartTime;
     }
 
-
     public void setWorkLengthTime(final long workLengthTime) {
         this.workLengthTime = workLengthTime;
     }
@@ -93,6 +96,58 @@ public class Ship implements Cloneable, Comparable<Ship> {
     @Override
     public int compareTo(Ship o) {
         return Long.compare(arriveTime, o.arriveTime);
+    }
+
+    public long getArriveTime() {
+        return arriveTime;
+    }
+
+    public void updateArriveTime(final long delay) {
+        arriveTime += delay;
+    }
+
+    @NotNull
+    private String getTime(final long time) {
+        final Calendar format = Calendar.getInstance();
+        format.setTimeInMillis(time);
+        return String.format("%d-го %s в %d:%d",
+                format.get(Calendar.DAY_OF_MONTH),
+                format.getDisplayName(Calendar.MONTH, Calendar.LONG, new Locale("ru")),
+                format.get(Calendar.HOUR_OF_DAY),
+                format.get(Calendar.MINUTE));
+    }
+
+    @NotNull
+    private String getWaitingFormatted() {
+        String res = "";
+        long minutes = waitingTime / 1000 / 60;
+        long days = minutes / 60 / 24;
+        res += days + ":";
+        long hours = (minutes - days * 60 * 24) / 60;
+        res += hours + ":";
+        minutes = minutes - days * 60 * 24 - hours * 60;
+        res += minutes;
+        return res;
+    }
+
+    @NotNull
+    @Override
+    public String toString() {
+        if (waitingTime == 0) {
+            return String.format("Корабль %s приплыл %s, имея на борту %d %s груза типа %s, будет разгружаться %d минут и стоять в порте на %d минут дольше",
+                    this.name, this.getTime(this.arriveTime), this.weight, this.weightType.getTitle(), this.type.getTitle(), this.stayTime / 1000 / 60, this.delay.get());
+        } else {
+            return String.format("Корабль %s приплыл %s, ожидал в очереди %s, начал разружаться в %s в течении %d минут",
+                    this.name, this.getTime(this.arriveTime), getWaitingFormatted(), this.getTime(this.workStartTime), this.workLengthTime / 1000 / 60);
+        }
+    }
+
+    @NotNull
+    @Override
+    public Ship clone() {
+        final Ship ship = new Ship(this.arriveTime, this.name, this.type, this.weight);
+        ship.setDelay(delay.get());
+        return ship;
     }
 
     public enum Type {
@@ -119,53 +174,5 @@ public class Ship implements Cloneable, Comparable<Ship> {
         public String getTitle() {
             return title;
         }
-    }
-
-    public long getArriveTime() {
-        return arriveTime;
-    }
-
-    public void updateArriveTime(final long delay) {
-        arriveTime += delay;
-    }
-
-    private String getTime(final long time) {
-        final Calendar format = Calendar.getInstance();
-        format.setTimeInMillis(time);
-        return String.format("%d-го %s в %d:%d",
-                format.get(Calendar.DAY_OF_MONTH),
-                format.getDisplayName(Calendar.MONTH, Calendar.LONG, new Locale("ru")),
-                format.get(Calendar.HOUR_OF_DAY),
-                format.get(Calendar.MINUTE));
-    }
-
-    private String getWaitingFormatted() {
-        String res = "";
-        long minutes = waitingTime / 1000 / 60;
-        long days = minutes / 60 / 24;
-        res += days + ":";
-        long hours = (minutes - days * 60 * 24) / 60;
-        res += hours + ":";
-        minutes = minutes - days * 60 * 24 - hours * 60;
-        res += minutes;
-        return res;
-    }
-
-    @Override
-    public String toString() {
-        if (waitingTime == 0) {
-            return String.format("Корабль %s приплыл %s, имея на борту %d %s груза типа %s, будет разгружаться %d минут и стоять в порте на %d минут дольше",
-                    this.name, this.getTime(this.arriveTime), this.weight, this.weightType.getTitle(), this.type.getTitle(), this.stayTime / 1000 / 60, this.delay.get());
-        } else {
-            return String.format("Корабль %s приплыл %s, ожидал в очереди %s, начал разружаться в %s в течении %d минут",
-                    this.name, this.getTime(this.arriveTime), getWaitingFormatted(), this.getTime(this.workStartTime), this.workLengthTime / 1000 / 60);
-        }
-    }
-
-    @Override
-    public Ship clone() {
-        final Ship ship = new Ship(this.arriveTime, this.name, this.type, this.weight);
-        ship.setDelay(delay.get());
-        return ship;
     }
 }
