@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.port.port.model.Crane;
 import com.port.port.model.StatisticObject;
+import com.port.timetable.TimetableGenerator;
 import com.port.timetable.model.Ship;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,8 +16,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.UnaryOperator;
 
-import static com.port.timetable.TimetableGenerator.CRANE_COST;
-import static com.port.timetable.TimetableGenerator.MINUTE;
+import static com.port.timetable.TimetableGenerator.*;
 
 public class PortController {
 
@@ -27,13 +27,15 @@ public class PortController {
     private int[] minCranesCount;
     private long avgQueryLength = 0;
     private long avgQueryDuration = 0;
-    private int avgDelay = 0;
-    private int maxDelay = Integer.MIN_VALUE;
+    private int minAvgDelay = 0;
+    private int minMaxDelay = Integer.MIN_VALUE;
     private long minTime = 0;
     private ArrayList<Ship> lastDoneList = new ArrayList<>();
     private final Calendar calendar = Calendar.getInstance();
     private final UnaryOperator<StatisticObject> onEnd;
     private StatisticObject statisticObject;
+    private int avgDelay = 0;
+    private int maxDelay = Integer.MIN_VALUE;
 
     @SuppressWarnings("deprecation")
     public PortController(final long startTime, @NotNull final UnaryOperator<StatisticObject> onEnd) throws FileNotFoundException {
@@ -43,14 +45,22 @@ public class PortController {
             this.timetable.add(new Gson().fromJson(elem.toString(), Ship.class));
         }
         currentTime = new AtomicLong(startTime);
-        timetable.forEach(ship -> {
-            if (ship.getDelay().get() > maxDelay) {
-                maxDelay = ship.getDelay().get();
-            }
-            avgDelay += ship.getDelay().get();
-        });
         calendar.setTimeInMillis(startTime);
         this.onEnd = onEnd;
+    }
+
+    private static void randomValues(@NotNull final LinkedList<Ship> timetable, final long time) {
+        timetable.forEach(ship -> {
+            int d = TimetableGenerator.random.nextInt(TimetableGenerator.MAX_WEIGHT_DELAY);
+            ship.setDelay(d);
+            final long delay = -MAX_TIME_DELAY + random.nextLong() % (MAX_TIME_DELAY * 2);
+            if (ship.getArriveTime() + delay < time) {
+                ship.updateArriveTime(-delay);
+            } else {
+                ship.updateArriveTime(delay);
+            }
+        });
+        Collections.sort(timetable);
     }
 
     public void initPort() {
@@ -63,7 +73,7 @@ public class PortController {
         final Ship.Type[] types = Ship.Type.values();
         if (stage == 3) {
             statisticObject = new StatisticObject(calendar.getTimeInMillis(), minTime, avgQueryLength,
-                    avgQueryDuration, avgDelay, maxDelay, minPenalty.get(), minCranesCount, lastDoneList);
+                    avgQueryDuration, minAvgDelay, minMaxDelay, minPenalty.get(), minCranesCount, lastDoneList);
             System.out.println();
             return;
         }
@@ -71,6 +81,15 @@ public class PortController {
         final LinkedList<Ship> timetable = new LinkedList<>();
         this.timetable.forEach(ship ->
                 timetable.add(ship.clone()));
+        randomValues(timetable, currentTime.get());
+        avgDelay = 0;
+        maxDelay = Integer.MIN_VALUE;
+        timetable.forEach(ship -> {
+            if (ship.getDelay().get() > maxDelay) {
+                maxDelay = ship.getDelay().get();
+            }
+            avgDelay += ship.getDelay().get();
+        });
         final HashMap<Ship.Type, Queue<Ship>> waitingShip = new HashMap<>();
         final HashMap<Ship.Type, Queue<Ship>> performShip = new HashMap<>();
         final HashMap<Ship.Type, ArrayList<Crane>> cranes = new HashMap<>();
@@ -177,6 +196,8 @@ public class PortController {
                 minCranesCount = cranesCount;
                 lastDoneList.clear();
                 lastDoneList.addAll(doneList);
+                minAvgDelay = avgDelay;
+                minMaxDelay = maxDelay;
                 simulate(cranesCount, stage, 0);
             }
         } else if (noChanges >= 3) {

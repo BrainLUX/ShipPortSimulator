@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.UUID;
@@ -18,10 +17,10 @@ public class TimetableGenerator {
     private static final long PERIOD_TIME = 30 * MINUTE * 60 * 24L;
     private static final int MAX_SHIPS = 100;
     private static final int MAX_WEIGHT = 1000;
-    private static final int MAX_WEIGHT_DELAY = 1440;
+    public static final int MAX_WEIGHT_DELAY = 1440;
     private static final int UUID_LENGTH = 5;
-    private static final long MAX_TIME_DELAY = 7 * MINUTE * 60 * 24L;
-    private static final Random random = new Random();
+    public static final long MAX_TIME_DELAY = 7 * MINUTE * 60 * 24L;
+    public static final Random random = new Random();
 
     @NotNull
     public static LinkedList<Ship> generate(final long time) {
@@ -32,22 +31,6 @@ public class TimetableGenerator {
                     UUID.randomUUID().toString().substring(0, UUID_LENGTH), getRandomShipType(), random.nextInt(MAX_WEIGHT));
             timetable.add(ship);
         }
-        return randomValues(timetable, time);
-    }
-
-    @NotNull
-    private static LinkedList<Ship> randomValues(@NotNull final LinkedList<Ship> timetable, final long time) {
-        timetable.forEach(ship -> {
-            int d = random.nextInt(MAX_WEIGHT_DELAY);
-            ship.setDelay(d);
-            final long delay = -MAX_TIME_DELAY + random.nextLong() % (MAX_TIME_DELAY * 2);
-            if (ship.getArriveTime() + delay < time) {
-                ship.updateArriveTime(-delay);
-            } else {
-                ship.updateArriveTime(delay);
-            }
-        });
-        Collections.sort(timetable);
         return timetable;
     }
 

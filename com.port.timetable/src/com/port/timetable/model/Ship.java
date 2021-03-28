@@ -46,7 +46,7 @@ public class Ship implements Cloneable, Comparable<Ship> {
                 goods.set(weight);
                 break;
         }
-        stayTime = (goods.get() / 2) * 1000 * 60;
+        stayTime = goods.get() * 1000 * 60;
     }
 
     public void setDelay(final int delay) {
@@ -137,8 +137,8 @@ public class Ship implements Cloneable, Comparable<Ship> {
             return String.format("Корабль %s приплыл %s, имея на борту %d %s груза типа %s, будет разгружаться %d минут и стоять в порте на %d минут дольше",
                     this.name, this.getTime(this.arriveTime), this.weight, this.weightType.getTitle(), this.type.getTitle(), this.stayTime / 1000 / 60, this.delay.get());
         } else {
-            return String.format("Корабль %s приплыл %s, ожидал в очереди %s, начал разружаться в %s в течении %d минут",
-                    this.name, this.getTime(this.arriveTime), getWaitingFormatted(), this.getTime(this.workStartTime), this.workLengthTime / 1000 / 60);
+            return String.format("Корабль %s типа %s приплыл %s, ожидал в очереди %s, начал разружаться в %s в течении %d минут",
+                    this.name, this.type.getTitle(), this.getTime(this.arriveTime), getWaitingFormatted(), this.getTime(this.workStartTime), this.workLengthTime / 1000 / 60);
         }
     }
 
