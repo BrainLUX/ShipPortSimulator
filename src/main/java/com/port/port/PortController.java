@@ -74,10 +74,7 @@ public class PortController {
     public void initPort() {
         final int[] cranesCount = new int[]{1, 1, 1};
         simulate(cranesCount, 0, 0);
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<>(new Gson().toJson(statisticObject), httpHeaders);
-        ResponseEntity<String> responseEntity = restTemplate.postForEntity(url + "statistic/", request, String.class);
+        ResponseEntity<String> responseEntity = restTemplate.postForEntity(url + "statistic/", new Gson().toJson(statisticObject), String.class);
         onEnd.apply(responseEntity.getBody());
     }
 

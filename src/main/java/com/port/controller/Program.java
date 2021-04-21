@@ -2,7 +2,6 @@ package com.port.controller;
 
 import com.dmitriev.oop.entity.Ship;
 import com.dmitriev.oop.entity.StatisticObject;
-import com.dmitriev.oop.exception.TimetableNotFoundException;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -30,6 +29,7 @@ public class Program {
 
     public static RestTemplate restTemplate = new RestTemplate();
     public static String url = "http://localhost:8080/main/";
+    public static String addShipUrl = "http://localhost:8080/timetable/add";
 
     private static String timetableFile = "";
     private static String statisticFile = "";
@@ -95,9 +95,8 @@ public class Program {
         try {
             final Ship ship = TimetableGenerator.generateShip(time, date, type, weight, delay);
             System.out.println("Информация о добавленном корабле: " + ship);
-            //timetable.add(ship);
+            restTemplate.postForEntity(addShipUrl + "?fileName=" + timetableFile, ship, String.class);
             ConsoleHandler.printMessage(SHIP_ADDED);
-            // Collections.sort(timetable);
         } catch (Exception e) {
             ConsoleHandler.printError(BAD_INPUT);
         }

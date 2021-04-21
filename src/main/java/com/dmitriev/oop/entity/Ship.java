@@ -49,6 +49,30 @@ public class Ship implements Cloneable, Comparable<Ship> {
         stayTime = goods.get() * 1000 * 60;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public WeightType getWeightType() {
+        return weightType;
+    }
+
+    public int getWeight() {
+        return weight;
+    }
+
+    public long getStayTime() {
+        return stayTime;
+    }
+
+    public long getWaitingTime() {
+        return waitingTime;
+    }
+
+    public long getWorkLengthTime() {
+        return workLengthTime;
+    }
+
     public void setDelay(final int delay) {
         this.delay.addAndGet(delay);
     }

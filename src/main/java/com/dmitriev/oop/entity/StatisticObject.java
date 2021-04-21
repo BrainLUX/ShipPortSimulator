@@ -42,6 +42,42 @@ public class StatisticObject {
         System.out.println(result.toString());
     }
 
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public long getEndTime() {
+        return endTime;
+    }
+
+    public long getAvgQueryLength() {
+        return avgQueryLength;
+    }
+
+    public long getAvgQueryDuration() {
+        return avgQueryDuration;
+    }
+
+    public long getAvgDelay() {
+        return avgDelay;
+    }
+
+    public long getMaxDelay() {
+        return maxDelay;
+    }
+
+    public long getPenalty() {
+        return penalty;
+    }
+
+    public int[] getMinCranesCount() {
+        return minCranesCount;
+    }
+
+    public ArrayList<Ship> getShipList() {
+        return shipList;
+    }
+
     @NotNull
     @Override
     public String toString() {
