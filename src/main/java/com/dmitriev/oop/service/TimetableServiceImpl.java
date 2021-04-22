@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.port.timetable.TimetableGenerator;
+import com.sun.istack.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -22,6 +23,7 @@ public class TimetableServiceImpl implements TimetableService {
     private LinkedList<Ship> ships = new LinkedList<>();
 
     @Override
+    @NotNull
     public LinkedList<Ship> generate(long time) {
         ships.clear();
         ships.addAll(TimetableGenerator.generate(time));
@@ -29,20 +31,22 @@ public class TimetableServiceImpl implements TimetableService {
     }
 
     @Override
+    @NotNull
     public LinkedList<Ship> get() {
         return ships;
     }
 
     @SuppressWarnings("deprecation")
     @Override
-    public Boolean add(Ship ship, String fileName) {
-        JsonParser jsonParser = new JsonParser();
-        JsonElement obj;
-        LinkedList<Ship> timetable = new LinkedList<>();
+    @NotNull
+    public Boolean add(@NotNull final Ship ship, @NotNull final String fileName) {
+        final JsonParser jsonParser = new JsonParser();
+        final JsonElement obj;
+        final LinkedList<Ship> timetable = new LinkedList<>();
         try {
             obj = jsonParser.parse(new Scanner(new File(fileName)).nextLine());
-            for (JsonElement elem : obj.getAsJsonArray()) {
-                Ship sh = new Gson().fromJson(elem.toString(), Ship.class);
+            for (final JsonElement elem : obj.getAsJsonArray()) {
+                final Ship sh = new Gson().fromJson(elem.toString(), Ship.class);
                 timetable.add(sh);
             }
             timetable.add(ship);

@@ -1,6 +1,5 @@
 package com.dmitriev.oop.web;
 
-import com.dmitriev.oop.entity.StatisticObject;
 import com.dmitriev.oop.service.MainService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,7 +22,7 @@ public class MainController {
         return new ResponseEntity<>(mainService.getTimetableByFile(fileName), HttpStatus.OK);
     }
 
-    @PostMapping(value = "/statistic", consumes = "application/json", produces = "text/plain")
+    @PostMapping("/statistic")
     public ResponseEntity<String> saveStatistic(@RequestBody String statisticObject) {
         return new ResponseEntity<>(mainService.saveStatistic(statisticObject), HttpStatus.OK);
     }

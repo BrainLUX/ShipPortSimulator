@@ -9,9 +9,11 @@ import java.util.List;
 
 public interface TimetableService {
     @NotNull
-    LinkedList<Ship> generate(long time);
+    LinkedList<Ship> generate(final long time);
 
+    @NotNull
     LinkedList<Ship> get();
 
-    Boolean add(Ship ship, String fileName);
+    @NotNull
+    Boolean add(@NotNull final Ship ship, @NotNull final String fileName);
 }

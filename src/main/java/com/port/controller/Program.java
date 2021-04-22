@@ -29,7 +29,7 @@ public class Program {
 
     public static RestTemplate restTemplate = new RestTemplate();
     public static String url = "http://localhost:8080/main/";
-    public static String addShipUrl = "http://localhost:8080/timetable/add";
+    private static String addShipUrl = "http://localhost:8080/timetable/add";
 
     private static String timetableFile = "";
     private static String statisticFile = "";
@@ -57,23 +57,24 @@ public class Program {
     @Nullable
     private static Void generateNewTimetable() {
         ConsoleHandler.printMessage(TIMETABLE_GENERATE_START);
-        ResponseEntity<String> responseEntity = restTemplate.getForEntity(url + "timetable/", String.class);
+        final ResponseEntity<String> responseEntity = restTemplate.getForEntity(url + "timetable/", String.class);
         timetableFile = responseEntity.getBody();
         ConsoleHandler.printMessage(TIMETABLE_GENERATE_END);
         return null;
     }
 
+    @SuppressWarnings("deprecation")
     @Nullable
     private static Void showTimetable() {
         System.out.println("Вывод расписания:\n");
         if (timetableFile.isBlank()) {
             ConsoleHandler.printError(NO_TIMETABLE);
         }
-        ResponseEntity<String> responseEntity = restTemplate.getForEntity(url + "timetable/" + timetableFile, String.class);
-        LinkedList<Ship> timetable = new LinkedList<>();
-        JsonParser jsonParser = new JsonParser();
-        JsonElement obj = jsonParser.parse(Objects.requireNonNull(responseEntity.getBody()));
-        for (JsonElement elem : obj.getAsJsonArray()) {
+        final ResponseEntity<String> responseEntity = restTemplate.getForEntity(url + "timetable/" + timetableFile, String.class);
+        final LinkedList<Ship> timetable = new LinkedList<>();
+        final JsonParser jsonParser = new JsonParser();
+        final JsonElement obj = jsonParser.parse(Objects.requireNonNull(responseEntity.getBody()));
+        for (final JsonElement elem : obj.getAsJsonArray()) {
             timetable.add(new Gson().fromJson(elem.toString(), Ship.class));
         }
         Collections.sort(timetable);
@@ -127,11 +128,11 @@ public class Program {
     @Nullable
     private static Void showStatistic() {
         if (!statisticFile.isBlank()) {
-            StatisticObject statisticObject;
-            StringBuilder result = new StringBuilder();
-            File file = new File(statisticFile);
+            final StatisticObject statisticObject;
+            final StringBuilder result = new StringBuilder();
+            final File file = new File(statisticFile);
             try {
-                Scanner sc = new Scanner(file);
+                final Scanner sc = new Scanner(file);
                 while (sc.hasNext()) {
                     result.append(sc.nextLine());
                 }

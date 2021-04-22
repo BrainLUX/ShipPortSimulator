@@ -1,11 +1,8 @@
 package com.dmitriev.oop.service;
 
-
-import com.dmitriev.oop.entity.StatisticObject;
 import com.dmitriev.oop.exception.TimetableNotFoundException;
-import com.google.gson.Gson;
-import com.port.port.PortController;
 import com.port.timetable.TimetableGenerator;
+import com.sun.istack.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -18,13 +15,14 @@ import java.util.UUID;
 
 @Service
 public class MainServiceImpl implements MainService {
-    private RestTemplate restTemplate = new RestTemplate();
-    private String url = "http://localhost:8080/timetable/generate/";
+    private final RestTemplate restTemplate = new RestTemplate();
+    private final String url = "http://localhost:8080/timetable/generate/";
 
     @Override
+    @NotNull
     public String getTimetable() {
-        ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
-        String fileName = "timetable-" + UUID.randomUUID().toString().substring(0, TimetableGenerator.UUID_LENGTH) + ".json";
+        final ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
+        final String fileName = "timetable-" + UUID.randomUUID().toString().substring(0, TimetableGenerator.UUID_LENGTH) + ".json";
         try {
             final FileWriter fileWriter = new FileWriter(fileName);
             fileWriter.write(Objects.requireNonNull(responseEntity.getBody()));
@@ -36,7 +34,8 @@ public class MainServiceImpl implements MainService {
     }
 
     @Override
-    public String getTimetableByFile(String fileName) {
+    @NotNull
+    public String getTimetableByFile(@NotNull final String fileName) {
         StringBuilder result = new StringBuilder();
         File file = new File(fileName);
         if (file.exists()) {
@@ -54,8 +53,9 @@ public class MainServiceImpl implements MainService {
     }
 
     @Override
-    public String saveStatistic(String statisticObject) {
-        String fileName = "statistic-" + UUID.randomUUID().toString().substring(0, TimetableGenerator.UUID_LENGTH) + ".json";
+    @NotNull
+    public String saveStatistic(@NotNull final String statisticObject) {
+        final String fileName = "statistic-" + UUID.randomUUID().toString().substring(0, TimetableGenerator.UUID_LENGTH) + ".json";
         try {
             final FileWriter fileWriter = new FileWriter(fileName);
             fileWriter.write(statisticObject);

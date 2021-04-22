@@ -1,9 +1,14 @@
 package com.dmitriev.oop.service;
 
+import com.sun.istack.NotNull;
+
 public interface MainService {
+    @NotNull
     String getTimetable();
 
-    String getTimetableByFile(String fileName);
+    @NotNull
+    String getTimetableByFile(@NotNull final String fileName);
 
-    String saveStatistic(String object);
+    @NotNull
+    String saveStatistic(@NotNull final String object);
 }

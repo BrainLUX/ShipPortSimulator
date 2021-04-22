@@ -26,7 +26,6 @@ import static com.port.timetable.TimetableGenerator.*;
 
 public class PortController {
 
-    public static final String TIMETABLE_FILE = "timetable.json";
     private final LinkedList<Ship> timetable = new LinkedList<>();
     private final AtomicLong currentTime;
     private AtomicLong minPenalty = new AtomicLong(Long.MAX_VALUE);
@@ -44,11 +43,11 @@ public class PortController {
     private int maxDelay = Integer.MIN_VALUE;
 
     @SuppressWarnings("deprecation")
-    public PortController(final long startTime, final String timetableFile, @NotNull final UnaryOperator<String> onEnd) {
-        ResponseEntity<String> responseEntity = restTemplate.getForEntity(url + "timetable/" + timetableFile, String.class);
-        JsonParser jsonParser = new JsonParser();
-        JsonElement obj = jsonParser.parse(Objects.requireNonNull(responseEntity.getBody()));
-        for (JsonElement elem : obj.getAsJsonArray()) {
+    public PortController(final long startTime, @NotNull final String timetableFile, @NotNull final UnaryOperator<String> onEnd) {
+        final ResponseEntity<String> responseEntity = restTemplate.getForEntity(url + "timetable/" + timetableFile, String.class);
+        final JsonParser jsonParser = new JsonParser();
+        final JsonElement obj = jsonParser.parse(Objects.requireNonNull(responseEntity.getBody()));
+        for (final JsonElement elem : obj.getAsJsonArray()) {
             timetable.add(new Gson().fromJson(elem.toString(), Ship.class));
         }
         Collections.sort(timetable);
@@ -59,7 +58,7 @@ public class PortController {
 
     private static void randomValues(@NotNull final LinkedList<Ship> timetable, final long time) {
         timetable.forEach(ship -> {
-            int d = TimetableGenerator.random.nextInt(TimetableGenerator.MAX_WEIGHT_DELAY);
+            final int d = TimetableGenerator.random.nextInt(TimetableGenerator.MAX_WEIGHT_DELAY);
             ship.setDelay(d);
             final long delay = -MAX_TIME_DELAY + random.nextLong() % (MAX_TIME_DELAY * 2);
             if (ship.getArriveTime() + delay < time) {
@@ -74,7 +73,7 @@ public class PortController {
     public void initPort() {
         final int[] cranesCount = new int[]{1, 1, 1};
         simulate(cranesCount, 0, 0);
-        ResponseEntity<String> responseEntity = restTemplate.postForEntity(url + "statistic/", new Gson().toJson(statisticObject), String.class);
+        final ResponseEntity<String> responseEntity = restTemplate.postForEntity(url + "statistic/", new Gson().toJson(statisticObject), String.class);
         onEnd.apply(responseEntity.getBody());
     }
 
