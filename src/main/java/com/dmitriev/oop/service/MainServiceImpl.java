@@ -23,12 +23,11 @@ public class MainServiceImpl implements MainService {
     public String getTimetable() {
         final ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
         final String fileName = "timetable-" + UUID.randomUUID().toString().substring(0, TimetableGenerator.UUID_LENGTH) + ".json";
-        try {
-            final FileWriter fileWriter = new FileWriter(fileName);
+        try (final FileWriter fileWriter = new FileWriter(fileName)) {
             fileWriter.write(Objects.requireNonNull(responseEntity.getBody()));
             fileWriter.flush();
-            fileWriter.close();
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            throw new TimetableNotFoundException();
         }
         return fileName;
     }
