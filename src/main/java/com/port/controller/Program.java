@@ -136,7 +136,8 @@ public class Program {
                 while (sc.hasNext()) {
                     result.append(sc.nextLine());
                 }
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                ConsoleHandler.printError(BAD_INPUT);
             }
             statisticObject = new Gson().fromJson(result.toString(), StatisticObject.class);
             System.out.println(statisticObject);
